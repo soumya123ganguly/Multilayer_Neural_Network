@@ -65,50 +65,58 @@ class Activation():
         """
         TODO: Implement the sigmoid activation here.
         """
-        raise NotImplementedError("Sigmoid not implemented")
+        return 1/(1+np.exp(-x))
+        #raise NotImplementedError("Sigmoid not implemented")
 
     def tanh(self, x):
         """
         TODO: Implement tanh here.
         """
-        raise NotImplementedError("Tanh not implemented")
+        return 1-2/(np.exp(2*x)+1)
+        #raise NotImplementedError("Tanh not implemented")
 
     def ReLU(self, x):
         """
         TODO: Implement ReLU here.
         """
-        raise NotImplementedError("ReLU not implemented")
+        return np.where(x>0.0,x,0)
+        #raise NotImplementedError("ReLU not implemented")
 
     def output(self, x):
         """
         TODO: Implement softmax function here.
         Remember to take care of the overflow condition.
         """
-        raise NotImplementedError("output activation not implemented")
+        return np.exp(x)/np.exp(x).sum(axis=1)
+        #raise NotImplementedError("output activation not implemented")
 
     def grad_sigmoid(self,x):
         """
         TODO: Compute the gradient for sigmoid here.
         """
-        raise NotImplementedError("Sigmoid gradient not implemented")
+        s = self.sigmoid(x)
+        return s-s*s 
+        #raise NotImplementedError("Sigmoid gradient not implemented")
 
     def grad_tanh(self,x):
         """
         TODO: Compute the gradient for tanh here.
         """
-        raise NotImplementedError("Tanh gradient not implemented")
+        t = self.tanh(x)
+        return 1-t*t
+        #raise NotImplementedError("Tanh gradient not implemented")
 
     def grad_ReLU(self,x):
         """
         TODO: Compute the gradient for ReLU here.
         """
-        raise NotImplementedError("ReLU gradient not implemented")
+        return np.where(x>0.0, 1,0.0)
+        #raise NotImplementedError("ReLU gradient not implemented")
 
     def grad_output(self, x):
         """
         Deliberately returning 1 for output layer case since we don't multiply by any activation for final layer's delta. Feel free to use/disregard it
         """
-
         return 1
 
 
