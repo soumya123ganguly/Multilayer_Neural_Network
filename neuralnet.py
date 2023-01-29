@@ -203,6 +203,7 @@ class Neuralnetwork():
 
         Make NeuralNetwork callable.
         """
+        self.x = x
         return self.forward(x, targets)
 
 
@@ -211,7 +212,14 @@ class Neuralnetwork():
         TODO: Compute forward pass through all the layers in the network and return the loss.
         If targets are provided, return loss and accuracy/number of correct predictions as well.
         """
-        raise NotImplementedError("Forward propagation not implemented for NeuralNetwork")
+        self.targets = targets
+        for i, layer in enumerate(self.layers):
+            if i == 0:
+                self.y = layer(self.x)
+            else:
+                self.y = layer(self.y)
+        return self.y
+        # raise NotImplementedError("Forward propagation not implemented for NeuralNetwork")
 
 
     def loss(self, logits, targets):
