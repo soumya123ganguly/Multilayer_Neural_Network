@@ -156,10 +156,9 @@ class Layer():
         TODO: Compute the forward pass (activation of the weighted input) through the layer here and return it.
         """
         self.x = x
-        self.a = x.dot(self.w)
+        self.a = self.w.dot(x)
         self.z = self.activation(self.a)
         return self.z
-        # raise NotImplementedError("Forward propagation not implemented for Layer")
 
     def backward(self, deltaCur, learning_rate, momentum_gamma, regularization, gradReqd=True):
         """
@@ -233,7 +232,8 @@ class Neuralnetwork():
         '''
         TODO: compute the categorical cross-entropy loss and return it.
         '''
-        raise NotImplementedError("Loss not implemented for NeuralNetwork")
+        return -(targets*np.log(logits)).sum(axis=1)
+        #raise NotImplementedError("Loss not implemented for NeuralNetwork")
 
     def backward(self, gradReqd=True):
         '''

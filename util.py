@@ -34,7 +34,10 @@ def normalize_data(inp):
         normalized inp: N X d 2D array
 
     """
-    raise NotImplementedError("normalize_data not implemented")
+    #raise NotImplementedError("normalize_data not implemented")
+    mn = inp.mean()
+    sd = inp.std()
+    return (inp-mn)/sd
 
 
 
@@ -51,7 +54,14 @@ def one_hot_encoding(labels, num_classes=20):
         oneHot : N X num_classes 2D array
 
     """
-    raise NotImplementedError("one_hot_encoding not implemented")
+    #raise NotImplementedError("one_hot_encoding not implemented")
+    z = np.zeros((len(labels), num_classes))
+    z[np.arange(len(labels)), labels-1] = 1
+    # ohe = []
+    # for l in labels:
+    #     ohe.append(np.eye(num_classes)[l-1])
+    # return np.array(ohe)
+    return z
 
 
 
@@ -89,7 +99,13 @@ def calculateCorrect(y,t):  #Feel free to use this function to return accuracy i
     returns:
         the number of correct predictions
     """
-    raise NotImplementedError("calculateCorrect not implemented")
+    #raise NotImplementedError("calculateCorrect not implemented")
+    # assume y and t are N X c matrices
+    indcory=np.argmax(y, axis=1) # indices where maximum occurs in each row 
+    indcort=np.argmax(t,axis=1)
+    return np.sum(indcory==indcort)
+
+
 
 
 
@@ -102,8 +118,9 @@ def append_bias(X):
     returns:
         X_bias (N X (d+1)) 2D Array
     """
-    raise NotImplementedError("append_bias not implemented")
-
+    #raise NotImplementedError("append_bias not implemented")
+    N,d=X.shape
+    return np.hstack((X,np.eye(N,1)))
 
 
 
@@ -155,8 +172,14 @@ def createTrainValSplit(x_train,y_train):
     TODO
     Creates the train-validation split (80-20 split for train-val). Please shuffle the data before creating the train-val split.
     """
-    raise NotImplementedError("createTrainValSplit not implemented")
-
+    #raise NotImplementedError("createTrainValSplit not implemented")
+    n=len(x_train)
+    # suffling data
+    idx=np.random.permutation(n)
+    x_train=x_train[idx]
+    y_train=y_train[idx]
+    # creating split
+    return (x_train[:4*n//5], y_train[:4*n//5], x_train[:-n//5], y_train[:-n//5])
 
 
 def load_data(path):
