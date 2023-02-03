@@ -66,29 +66,25 @@ class Activation():
         TODO: Implement the sigmoid activation here.
         """
         return 1/(1+np.exp(-x))
-        #raise NotImplementedError("Sigmoid not implemented")
 
     def tanh(self, x):
         """
         TODO: Implement tanh here.
         """
         return 1-2/(np.exp(2*x)+1)
-        #raise NotImplementedError("Tanh not implemented")
 
     def ReLU(self, x):
         """
         TODO: Implement ReLU here.
         """
         return np.where(x>0.0,x,0)
-        #raise NotImplementedError("ReLU not implemented")
 
     def output(self, x):
         """
         TODO: Implement softmax function here.
         Remember to take care of the overflow condition.
         """
-        return np.exp(x)/np.exp(x).sum(axis=1)
-        #raise NotImplementedError("output activation not implemented")
+        return np.exp(x)/(np.exp(x).sum(axis=1))[:, None]
 
     def grad_sigmoid(self,x):
         """
@@ -96,7 +92,6 @@ class Activation():
         """
         s = self.sigmoid(x)
         return s-s*s 
-        #raise NotImplementedError("Sigmoid gradient not implemented")
 
     def grad_tanh(self,x):
         """
@@ -104,14 +99,12 @@ class Activation():
         """
         t = self.tanh(x)
         return 1-t*t
-        #raise NotImplementedError("Tanh gradient not implemented")
 
     def grad_ReLU(self,x):
         """
         TODO: Compute the gradient for ReLU here.
         """
         return np.where(x>0.0, 1,0.0)
-        #raise NotImplementedError("ReLU gradient not implemented")
 
     def grad_output(self, x):
         """
@@ -155,8 +148,8 @@ class Layer():
         """
         TODO: Compute the forward pass (activation of the weighted input) through the layer here and return it.
         """
-        self.x = x
-        self.a = self.w.dot(x)
+        self.x = util.append_bias(x)
+        self.a = self.x.dot(self.w)
         self.z = self.activation(self.a)
         return self.z
 
@@ -171,10 +164,12 @@ class Layer():
         Feel free to change the function signature if you think of an alternative way to implement the delta calculation or the backward pass.
         gradReqd=True means update self.w with self.dw. gradReqd=False can be helpful for Q-3b
         """
-        deltaNext = self.activation.backward(self.a)*self.w.dot(deltaCur)
+        if deltaCur.shape[1] != 20:
+            deltaCur = self.activation.backward(self.z)*deltaCur[:, :-1]
+        deltaNext = deltaCur.dot(self.w.T)
         self.w += learning_rate*self.x.T.dot(deltaCur)
+        self.dw = self.x.T.dot(deltaCur)
         return deltaNext
-        # raise NotImplementedError("Backward propagation not implemented for Layer")
 
 
 class Neuralnetwork():
@@ -209,7 +204,6 @@ class Neuralnetwork():
 
         Make NeuralNetwork callable.
         """
-        self.x = x
         return self.forward(x, targets)
 
 
@@ -218,33 +212,30 @@ class Neuralnetwork():
         TODO: Compute forward pass through all the layers in the network and return the loss.
         If targets are provided, return loss and accuracy/number of correct predictions as well.
         """
+        self.x = x
         self.targets = targets
         for i, layer in enumerate(self.layers):
             if i == 0:
-                self.y = layer(self.x)
+                self.y = layer(x)
             else:
                 self.y = layer(self.y)
-        return self.y
-        # raise NotImplementedError("Forward propagation not implemented for NeuralNetwork")
+        return self.loss(self.y, self.targets)
 
 
     def loss(self, logits, targets):
         '''
         TODO: compute the categorical cross-entropy loss and return it.
         '''
-        return -(targets*np.log(logits)).sum(axis=1)
-        #raise NotImplementedError("Loss not implemented for NeuralNetwork")
+        return -(targets*np.log(logits+1e-15)).sum()
 
     def backward(self, gradReqd=True):
         '''
         TODO: Implement backpropagation here by calling backward method of Layers class.
         Call backward methods of individual layers.
         '''
-        self.layers.reverse()
         deltaCur = self.targets-self.y
-        for layer in self.layers:
+        for layer in reversed(self.layers):
                 deltaCur = layer.backward(deltaCur, 0.01, None, None)
-        # raise NotImplementedError("Backward propagation not implemented for NeuralNetwork")
 
 
 

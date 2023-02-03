@@ -23,7 +23,7 @@ def main(args):
     # Create different config files for different experiments
     configFile=None #Will contain the name of the config file to be loaded
     if (args.experiment == 'test_gradients'):  #3b
-        configFile = None # Create a config file for 3b and change None to the config file name
+        configFile = "config_3c.yaml" # Create a config file for 3b and change None to the config file name
     elif(args.experiment=='test_momentum'):  #3c
         configFile = "config_3c.yaml" # Create a config file for 3c and change None to the config file name
     elif (args.experiment == 'test_regularization'): #3d

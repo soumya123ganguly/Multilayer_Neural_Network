@@ -34,7 +34,6 @@ def normalize_data(inp):
         normalized inp: N X d 2D array
 
     """
-    #raise NotImplementedError("normalize_data not implemented")
     mn = inp.mean()
     sd = inp.std()
     return (inp-mn)/sd
@@ -54,13 +53,8 @@ def one_hot_encoding(labels, num_classes=20):
         oneHot : N X num_classes 2D array
 
     """
-    #raise NotImplementedError("one_hot_encoding not implemented")
     z = np.zeros((len(labels), num_classes))
     z[np.arange(len(labels)), labels-1] = 1
-    # ohe = []
-    # for l in labels:
-    #     ohe.append(np.eye(num_classes)[l-1])
-    # return np.array(ohe)
     return z
 
 
@@ -99,11 +93,9 @@ def calculateCorrect(y,t):  #Feel free to use this function to return accuracy i
     returns:
         the number of correct predictions
     """
-    #raise NotImplementedError("calculateCorrect not implemented")
-    # assume y and t are N X c matrices
-    indcory=np.argmax(y, axis=1) # indices where maximum occurs in each row 
-    indcort=np.argmax(t,axis=1)
-    return np.sum(indcory==indcort)
+    indcory = np.argmax(y, axis=1)
+    indcort = np.argmax(t, axis=1)
+    return (indcory == indcort).mean()
 
 
 
@@ -118,8 +110,7 @@ def append_bias(X):
     returns:
         X_bias (N X (d+1)) 2D Array
     """
-    #raise NotImplementedError("append_bias not implemented")
-    N,d=X.shape
+    N, _ = X.shape
     return np.hstack((X,np.eye(N,1)))
 
 
@@ -179,7 +170,7 @@ def createTrainValSplit(x_train,y_train):
     x_train=x_train[idx]
     y_train=y_train[idx]
     # creating split
-    return (x_train[:4*n//5], y_train[:4*n//5], x_train[:-n//5], y_train[:-n//5])
+    return (x_train[:4*n//5], y_train[:4*n//5], x_train[4*n//5:], y_train[4*n//5:])
 
 
 def load_data(path):
@@ -213,17 +204,17 @@ def load_data(path):
     train_labels = np.array(train_labels).reshape((len(train_labels),-1))
     train_images, train_labels, val_images, val_labels = createTrainValSplit(train_images,train_labels)
 
-    train_normalized_images =  None #TODO
-    train_one_hot_labels = None #TODO
+    train_normalized_images = normalize_data(train_images) #TODO: normalize by channel
+    train_one_hot_labels = one_hot_encoding(train_labels)
 
-    val_normalized_images = None #TODO
-    val_one_hot_labels = None #TODO
+    val_normalized_images = normalize_data(val_images) #TODO: normalize by channel
+    val_one_hot_labels = one_hot_encoding(val_labels)
 
     test_images_dict = unpickle(os.path.join(cifar_path, "test"))
     test_data = test_images_dict[b'data']
     test_labels = test_images_dict[b'coarse_labels']
     test_images = np.array(test_data)
     test_labels = np.array(test_labels).reshape((len(test_labels), -1))
-    test_normalized_images= None #TODO
-    test_one_hot_labels = None #TODO
+    test_normalized_images= normalize_data(test_images) #TODO: normalize by channel
+    test_one_hot_labels = one_hot_encoding(test_labels)
     return train_normalized_images, train_one_hot_labels, val_normalized_images, val_one_hot_labels,  test_normalized_images, test_one_hot_labels

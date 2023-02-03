@@ -1,7 +1,7 @@
 # This specifies the number of layers and number of hidden neurons in each layer.
 # Note that the first and the last elements of the list indicate the input and
 # output sizes
-layer_specs: [3072, 128, 10]  #Represents a 2 layer NN. 3072 is the input layer
+layer_specs: [3072, 128, 20]  #Represents a 2 layer NN. 3072 is the input layer
 
 # Type of non-linear activation function to be used for the layers.
 activation: "tanh"
