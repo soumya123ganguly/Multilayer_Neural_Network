@@ -155,7 +155,11 @@ class Layer():
         """
         TODO: Compute the forward pass (activation of the weighted input) through the layer here and return it.
         """
-        raise NotImplementedError("Forward propagation not implemented for Layer")
+        self.x = x
+        self.a = x.dot(self.w)
+        self.z = self.activation(self.a)
+        return self.z
+        # raise NotImplementedError("Forward propagation not implemented for Layer")
 
     def backward(self, deltaCur, learning_rate, momentum_gamma, regularization, gradReqd=True):
         """
@@ -168,7 +172,10 @@ class Layer():
         Feel free to change the function signature if you think of an alternative way to implement the delta calculation or the backward pass.
         gradReqd=True means update self.w with self.dw. gradReqd=False can be helpful for Q-3b
         """
-        raise NotImplementedError("Backward propagation not implemented for Layer")
+        deltaNext = self.activation.backward(self.a)*self.w.dot(deltaCur)
+        self.w += learning_rate*self.x.T.dot(deltaCur)
+        return deltaNext
+        # raise NotImplementedError("Backward propagation not implemented for Layer")
 
 
 class Neuralnetwork():
@@ -233,7 +240,11 @@ class Neuralnetwork():
         TODO: Implement backpropagation here by calling backward method of Layers class.
         Call backward methods of individual layers.
         '''
-        raise NotImplementedError("Backward propagation not implemented for NeuralNetwork")
+        self.layers.reverse()
+        deltaCur = self.targets-self.y
+        for layer in self.layers:
+                deltaCur = layer.backward(deltaCur, 0.01, None, None)
+        # raise NotImplementedError("Backward propagation not implemented for NeuralNetwork")
 
 
 
