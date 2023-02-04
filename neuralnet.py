@@ -169,9 +169,8 @@ class Layer():
         deltaCur = self.activation.backward(self.a)*deltaCur
         deltaNext = deltaCur.dot(self.w.T)
         self.dw = -self.x.T.dot(deltaCur)
-        self.v = momentum_gamma*self.v - learning_rate*self.dw
+        self.v = momentum_gamma*self.v-learning_rate*self.dw/batch_size
         if gradReqd:
-            # self.w -= learning_rate*self.dw/batch_size
             self.w += self.v
         return deltaNext
 
@@ -231,7 +230,7 @@ class Neuralnetwork():
         '''
         TODO: compute the categorical cross-entropy loss and return it.
         '''
-        return -(targets*np.log(logits+1e-15)).sum().mean()
+        return -(targets*np.log(logits+1e-15)).sum(axis=1).mean()
 
     def backward(self, gradReqd=True):
         '''

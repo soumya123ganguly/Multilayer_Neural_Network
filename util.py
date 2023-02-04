@@ -92,9 +92,9 @@ def calculateCorrect(y,t):  #Feel free to use this function to return accuracy i
     returns:
         the number of correct predictions
     """
-    indcory = np.argmax(y, axis=1)
-    indcort = np.argmax(t, axis=1)
-    return (indcory == indcort).mean()
+    predicted_labels = np.argmax(y, axis=1)
+    target_labels = np.argmax(t, axis=1)
+    return (predicted_labels == target_labels).mean()*100
 
 
 def append_bias(X):
@@ -197,10 +197,21 @@ def load_data(path):
     train_labels = np.array(train_labels).reshape((len(train_labels),-1))
     train_images, train_labels, val_images, val_labels = createTrainValSplit(train_images,train_labels)
 
-    train_normalized_images = normalize_data(train_images) #TODO: normalize by channel
+    channel_size = train_images.shape[1]//3
+    train_normalize_r = normalize_data(train_images[:, :channel_size])
+    train_normalize_g = normalize_data(train_images[:, channel_size:2*channel_size])
+    train_normalize_b = normalize_data(train_images[:, 2*channel_size:])
+    train_normalized_images = np.concatenate((train_normalize_r, 
+                                              train_normalize_g, 
+                                              train_normalize_b), axis=1)
     train_one_hot_labels = one_hot_encoding(train_labels)
 
-    val_normalized_images = normalize_data(val_images) #TODO: normalize by channel
+    val_normalize_r = normalize_data(val_images[:, :channel_size])
+    val_normalize_g = normalize_data(val_images[:, channel_size:2*channel_size])
+    val_normalize_b = normalize_data(val_images[:, 2*channel_size:])
+    val_normalized_images = np.concatenate((val_normalize_r, 
+                                            val_normalize_g, 
+                                            val_normalize_b), axis=1)
     val_one_hot_labels = one_hot_encoding(val_labels)
 
     test_images_dict = unpickle(os.path.join(cifar_path, "test"))

@@ -2,6 +2,7 @@
 import copy
 import util
 from neuralnet import *
+from tqdm import tqdm
 
 def train(model, x_train, y_train, x_valid, y_valid, config):
     """
@@ -24,12 +25,16 @@ def train(model, x_train, y_train, x_valid, y_valid, config):
 
     # Read in the esssential configs
     epochs = config["epochs"]
-    train_losses = []
-    train_accuracies = []
-    valid_losses = []
-    valid_accuracies = []
-    for epoch in range(epochs):
-        print(epoch)
+    early_stopping = config["early_stop"]
+    max_patience = config["early_stop_epoch"]
+    patience = 0
+    min_valid_loss = 1e100
+
+    trainEpochLoss = []
+    trainEpochAccuracy = []
+    validEpochLoss = []
+    validEpochAccuracies = []
+    for epoch in tqdm(range(epochs)):
         num_train_samples = len(x_train)
         num_valid_samples = len(x_valid)
         batch_size = config["batch_size"]
@@ -38,33 +43,55 @@ def train(model, x_train, y_train, x_valid, y_valid, config):
         valid_mb_itr = util.generate_minibatches((x_valid, y_valid), 
                                                  batch_size=batch_size)
         train_loss = 0
-        train_accy = 0
+        train_accuracy = 0
         for _ in range(num_train_samples//batch_size):
             x_train_mb, y_train_mb = next(train_mb_itr)
             loss = model.forward(x_train_mb, targets=y_train_mb)
             yh_train_mb = model.y
             model.backward()
             train_loss += loss
-            train_accy += util.calculateCorrect(yh_train_mb, y_train_mb)
+            train_accuracy += util.calculateCorrect(yh_train_mb, y_train_mb)
         train_loss /= (num_train_samples//batch_size)
-        train_accy /= (num_train_samples//batch_size)
+        train_accuracy /= (num_train_samples//batch_size)
 
         valid_loss = 0
-        valid_accy = 0
+        valid_accuracy = 0
         for _ in range(num_valid_samples//batch_size):
             x_valid_mb, y_valid_mb = next(valid_mb_itr)
             loss = model.forward(x_valid_mb, targets=y_valid_mb)
             yh_valid_mb = model.y
             valid_loss += loss
-            valid_accy += util.calculateCorrect(yh_valid_mb, y_valid_mb)
+            valid_accuracy += util.calculateCorrect(yh_valid_mb, y_valid_mb)
         valid_loss /= (num_valid_samples//batch_size)
-        valid_accy /= (num_valid_samples//batch_size)
+        valid_accuracy /= (num_valid_samples//batch_size)
         
-        train_losses.append(train_loss)
-        train_accuracies.append(train_accy)
-        valid_losses.append(valid_loss)
-        valid_accuracies.append(valid_accy)
-    util.plots(train_losses, train_accuracies, valid_losses, valid_accuracies, earlyStop=19)
+        # Update train and validation losses and accuracies
+        trainEpochLoss.append(train_loss)
+        trainEpochAccuracy.append(train_accuracy)
+        validEpochLoss.append(valid_loss)
+        validEpochAccuracies.append(valid_accuracy)
+
+        # Early Stopping
+        if early_stopping:
+            if valid_loss > min_valid_loss:
+                patience += 1
+                if patience == max_patience:
+                    util.plots(trainEpochLoss, 
+                               trainEpochAccuracy, 
+                               validEpochLoss, 
+                               validEpochAccuracies, 
+                               epoch)
+                    return model
+            else:
+                min_valid_loss = valid_loss
+                patience = 0
+
+    # Save plots
+    util.plots(trainEpochLoss, 
+               trainEpochAccuracy, 
+               validEpochLoss, 
+               validEpochAccuracies, 
+               epoch)
 
     return model
 
@@ -88,15 +115,15 @@ def modelTest(model, X_test, y_test):
     test_mb_itr = util.generate_minibatches((X_test, y_test), 
                                                 batch_size=batch_size)
     test_loss = 0
-    test_accy = 0
+    test_accuracy = 0
     for _ in range(num_test_samples//batch_size):
         x_test_mb, y_test_mb = next(test_mb_itr)
         loss = model.forward(x_test_mb, targets=y_test_mb)
         yh_test_mb = model.y
         test_loss += loss
-        test_accy += util.calculateCorrect(yh_test_mb, y_test_mb)
+        test_accuracy += util.calculateCorrect(yh_test_mb, y_test_mb)
     test_loss /= (num_test_samples//batch_size)
-    test_accy /= (num_test_samples//batch_size)
-    return test_loss, test_accy
+    test_accuracy /= (num_test_samples//batch_size)
+    return test_accuracy, test_loss
 
 
