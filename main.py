@@ -15,6 +15,7 @@ from constants import *
 from train import *
 from gradient import *
 import argparse
+from neuralnet import *
 
 #TODO
 def main(args):
@@ -45,17 +46,17 @@ def main(args):
     config = util.load_config(configYamlPath + configFile) # Set configYamlPath, configFile  in constants.py
 
     if(args.experiment == 'test_gradients'):
-        gradient.checkGradient(x_train,y_train,config)
+        gradient.checkGradient(x_train, y_train, config)
         return 1
 
     # Create a Neural Network object which will be our model
-    model = None
+    model = Neuralnetwork(config=config)
 
     # train the model. Use train.py's train method for this
-    model = None
+    model = train(model, x_train, y_train, x_valid, y_valid, config)
 
     # test the model. Use train.py's modelTest method for this
-    test_acc, test_loss =  None,None
+    test_acc, test_loss =  modelTest(model, x_test, y_test)
 
     # Print test accuracy and test loss
     print('Test Accuracy:', test_acc, ' Test Loss:', test_loss)

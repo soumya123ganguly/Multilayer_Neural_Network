@@ -53,11 +53,10 @@ def one_hot_encoding(labels, num_classes=20):
         oneHot : N X num_classes 2D array
 
     """
-    z = np.zeros((len(labels), num_classes))
-    z[np.arange(len(labels)), labels-1] = 1
+    num_samples = len(labels)
+    z = np.zeros((num_samples, num_classes))
+    z[np.arange(num_samples), labels.reshape(-1)-1] = 1
     return z
-
-
 
 def generate_minibatches(dataset, batch_size=64):
     """
@@ -98,9 +97,6 @@ def calculateCorrect(y,t):  #Feel free to use this function to return accuracy i
     return (indcory == indcort).mean()
 
 
-
-
-
 def append_bias(X):
     """
     TODO
@@ -110,8 +106,8 @@ def append_bias(X):
     returns:
         X_bias (N X (d+1)) 2D Array
     """
-    N, _ = X.shape
-    return np.hstack((X,np.eye(N,1)))
+    num_samples = len(X)
+    return np.hstack((X, np.ones((num_samples,1))))
 
 
 
@@ -163,13 +159,10 @@ def createTrainValSplit(x_train,y_train):
     TODO
     Creates the train-validation split (80-20 split for train-val). Please shuffle the data before creating the train-val split.
     """
-    #raise NotImplementedError("createTrainValSplit not implemented")
-    n=len(x_train)
-    # suffling data
-    idx=np.random.permutation(n)
-    x_train=x_train[idx]
-    y_train=y_train[idx]
-    # creating split
+    n = len(x_train)
+    idx = np.random.permutation(n)
+    x_train = x_train[idx]
+    y_train = y_train[idx]
     return (x_train[:4*n//5], y_train[:4*n//5], x_train[4*n//5:], y_train[4*n//5:])
 
 
