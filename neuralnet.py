@@ -168,7 +168,7 @@ class Layer():
         deltaCur = deltaCur[:, :-1]
         deltaCur = self.activation.backward(self.a)*deltaCur
         deltaNext = deltaCur.dot(self.w.T)
-        self.dw = -self.x.T.dot(deltaCur)
+        self.dw = -self.x.T.dot(deltaCur)+2*regularization*self.w
         self.v = momentum_gamma*self.v-learning_rate*self.dw/batch_size
         if gradReqd:
             self.w += self.v
@@ -194,6 +194,7 @@ class Neuralnetwork():
 
         self.learning_rate = config['learning_rate']
         self.momentum_gamma = config['momentum_gamma']
+        self.regularization = config['L2_penalty']
 
         # Add layers specified by layer_specs.
         for i in range(self.num_layers):
@@ -221,9 +222,14 @@ class Neuralnetwork():
         self.x = x
         self.y = x
         self.targets = targets
+        error = 0
         for layer in self.layers:
                 self.y = layer.forward(self.y)
-        return self.loss(self.y, self.targets)
+                # Adding L2 regularization
+                error += self.regularization*(layer.w**2).sum()
+        # Adding cross entropy
+        error += self.loss(self.y, self.targets)
+        return error
 
 
     def loss(self, logits, targets):
@@ -239,4 +245,6 @@ class Neuralnetwork():
         '''
         deltaCur = util.append_bias(self.targets-self.y)
         for layer in reversed(self.layers):
-                deltaCur = layer.backward(deltaCur, self.learning_rate, self.momentum_gamma, None, gradReqd)
+                deltaCur = layer.backward(deltaCur, self.learning_rate, 
+                                          self.momentum_gamma, self.regularization, 
+                                          gradReqd)
