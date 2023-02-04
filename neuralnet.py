@@ -241,6 +241,3 @@ class Neuralnetwork():
         deltaCur = util.append_bias(self.targets-self.y)
         for layer in reversed(self.layers):
                 deltaCur = layer.backward(deltaCur, self.learning_rate, self.momentum_gamma, None, gradReqd)
-
-
-
