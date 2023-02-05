@@ -29,6 +29,7 @@ def train(model, x_train, y_train, x_valid, y_valid, config):
     max_patience = config["early_stop_epoch"]
     patience = 0
     min_valid_loss = 1e100
+    best_valid_accuracy = -1
 
     trainEpochLoss = []
     trainEpochAccuracy = []
@@ -64,6 +65,9 @@ def train(model, x_train, y_train, x_valid, y_valid, config):
             valid_accuracy += util.calculateCorrect(yh_valid_mb, y_valid_mb)
         valid_loss /= (num_valid_samples//batch_size)
         valid_accuracy /= (num_valid_samples//batch_size)
+
+        if valid_accuracy > best_valid_accuracy:
+            best_valid_accuracy = valid_accuracy
         
         # Update train and validation losses and accuracies
         trainEpochLoss.append(train_loss)
@@ -76,6 +80,7 @@ def train(model, x_train, y_train, x_valid, y_valid, config):
             if valid_loss > min_valid_loss:
                 patience += 1
                 if patience == max_patience:
+                    print("best_valid_accuracy: ", best_valid_accuracy)
                     util.plots(trainEpochLoss, 
                                trainEpochAccuracy, 
                                validEpochLoss, 
@@ -87,6 +92,7 @@ def train(model, x_train, y_train, x_valid, y_valid, config):
                 patience = 0
 
     # Save plots
+    print("best_valid_accuracy: ", best_valid_accuracy)
     util.plots(trainEpochLoss, 
                trainEpochAccuracy, 
                validEpochLoss, 
