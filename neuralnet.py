@@ -168,8 +168,8 @@ class Layer():
         deltaCur = deltaCur[:, :-1]
         deltaCur = self.activation.backward(self.a)*deltaCur
         deltaNext = deltaCur.dot(self.w.T)
-        self.dw = -self.x.T.dot(deltaCur)+2*regularization*self.w
-        self.v = momentum_gamma*self.v-learning_rate*self.dw/batch_size
+        self.dw = -self.x.T.dot(deltaCur)
+        self.v = momentum_gamma*self.v-learning_rate*self.dw/batch_size-2*regularization*self.w
         if gradReqd:
             self.w += self.v
         return deltaNext

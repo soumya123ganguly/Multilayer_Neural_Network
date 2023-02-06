@@ -19,10 +19,10 @@ epochs: 100
 early_stop: True
 
 # History for early stopping. Wait for this many epochs to check validation loss / accuracy.
-early_stop_epoch: 5
+early_stop_epoch: 10
 
 # Regularization constant
-L2_penalty: 0.000
+L2_penalty: 0.0001
 
 # Use momentum for training
 momentum: True
