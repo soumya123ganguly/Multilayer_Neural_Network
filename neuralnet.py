@@ -222,14 +222,9 @@ class Neuralnetwork():
         self.x = x
         self.y = x
         self.targets = targets
-        error = 0
         for layer in self.layers:
                 self.y = layer.forward(self.y)
-                # Adding L2 regularization
-                error += self.regularization*(layer.w**2).sum()
-        # Adding cross entropy
-        error += self.loss(self.y, self.targets)
-        return error
+        return self.loss(self.y, self.targets)
 
 
     def loss(self, logits, targets):

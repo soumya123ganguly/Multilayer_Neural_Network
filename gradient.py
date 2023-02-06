@@ -15,15 +15,17 @@ def check_grad(model, x_train, y_train):
         Prints gradient difference of values calculated via numerical approximation and backprop implementation
     """
     eps = 1e-2
-    model.layers[1].w[5, 5] += eps
+    l = 1
+    n = 1
+    model.layers[l].w[-1, n] += eps
     E_wp = model.forward(x_train, targets=y_train)
-    model.layers[1].w[5, 5] -= 2*eps
+    model.layers[l].w[-1, n] -= 2*eps
     E_wm = model.forward(x_train, targets=y_train)
-    model.layers[1].w[5, 5] += eps
+    model.layers[l].w[-1, n] += eps
     model.forward(x_train, targets=y_train)
     model.backward(gradReqd=False)
-    dw = model.layers[1].dw
-    print(dw[5, 5], (E_wp-E_wm)/(2*eps), dw[5, 5]-((E_wp-E_wm)/(2*eps)), dw[5, 5]/((E_wp-E_wm)/(2*eps)))
+    dw = model.layers[l].dw
+    print("&", (E_wp-E_wm)/(2*eps), "\t&", dw[-1, n], "\t&", dw[-1, n]-((E_wp-E_wm)/(2*eps)))
 
 def checkGradient(x_train,y_train,config):
 

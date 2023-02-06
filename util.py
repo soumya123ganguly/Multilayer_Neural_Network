@@ -34,11 +34,21 @@ def normalize_data(inp):
         normalized inp: N X d 2D array
 
     """
-    mn = inp.mean()
-    sd = inp.std()
-    return (inp-mn)/sd
-
-
+    channel_size = inp.shape[1]//3
+    def normalize_channel(inp):
+        """
+            Normalize a channel.
+        """
+        mean = inp.mean()
+        std = inp.std()
+        return (inp-mean)/std
+    inp_normalize_r = normalize_channel(inp[:, :channel_size])
+    inp_normalize_g = normalize_channel(inp[:, channel_size:2*channel_size])
+    inp_normalize_b = normalize_channel(inp[:, 2*channel_size:])
+    inp_normalized_images = np.concatenate((inp_normalize_r, 
+                                            inp_normalize_g, 
+                                            inp_normalize_b), axis=1)
+    return inp_normalized_images
 
 def one_hot_encoding(labels, num_classes=20):
     """
@@ -197,21 +207,10 @@ def load_data(path):
     train_labels = np.array(train_labels).reshape((len(train_labels),-1))
     train_images, train_labels, val_images, val_labels = createTrainValSplit(train_images,train_labels)
 
-    channel_size = train_images.shape[1]//3
-    train_normalize_r = normalize_data(train_images[:, :channel_size])
-    train_normalize_g = normalize_data(train_images[:, channel_size:2*channel_size])
-    train_normalize_b = normalize_data(train_images[:, 2*channel_size:])
-    train_normalized_images = np.concatenate((train_normalize_r, 
-                                              train_normalize_g, 
-                                              train_normalize_b), axis=1)
+    train_normalized_images = normalize_data(train_images)
     train_one_hot_labels = one_hot_encoding(train_labels)
 
-    val_normalize_r = normalize_data(val_images[:, :channel_size])
-    val_normalize_g = normalize_data(val_images[:, channel_size:2*channel_size])
-    val_normalize_b = normalize_data(val_images[:, 2*channel_size:])
-    val_normalized_images = np.concatenate((val_normalize_r, 
-                                            val_normalize_g, 
-                                            val_normalize_b), axis=1)
+    val_normalized_images = normalize_data(val_images)
     val_one_hot_labels = one_hot_encoding(val_labels)
 
     test_images_dict = unpickle(os.path.join(cifar_path, "test"))
@@ -219,6 +218,6 @@ def load_data(path):
     test_labels = test_images_dict[b'coarse_labels']
     test_images = np.array(test_data)
     test_labels = np.array(test_labels).reshape((len(test_labels), -1))
-    test_normalized_images= normalize_data(test_images) #TODO: normalize by channel
+    test_normalized_images= normalize_data(test_images)
     test_one_hot_labels = one_hot_encoding(test_labels)
     return train_normalized_images, train_one_hot_labels, val_normalized_images, val_one_hot_labels,  test_normalized_images, test_one_hot_labels
