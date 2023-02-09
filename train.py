@@ -27,10 +27,13 @@ def train(model, x_train, y_train, x_valid, y_valid, config):
     epochs = config["epochs"]
     early_stopping = config["early_stop"]
     max_patience = config["early_stop_epoch"]
+    
+    # Initlialize parameters to early stop
     patience = 0
     min_valid_loss = 1e100
     best_valid_accuracy = -1
 
+    # Initlialize loss and accuracy lists for train and validation
     trainEpochLoss = []
     trainEpochAccuracy = []
     validEpochLoss = []
@@ -39,6 +42,7 @@ def train(model, x_train, y_train, x_valid, y_valid, config):
         num_train_samples = len(x_train)
         num_valid_samples = len(x_valid)
         batch_size = config["batch_size"]
+        # Generate iterator for train and validation minibatches
         train_mb_itr = util.generate_minibatches((x_train, y_train), 
                                                  batch_size=batch_size)
         valid_mb_itr = util.generate_minibatches((x_valid, y_valid), 
@@ -49,9 +53,11 @@ def train(model, x_train, y_train, x_valid, y_valid, config):
             x_train_mb, y_train_mb = next(train_mb_itr)
             loss = model.forward(x_train_mb, targets=y_train_mb)
             yh_train_mb = model.y
+            # Compute backward prop on train set
             model.backward()
             train_loss += loss
             train_accuracy += util.calculateCorrect(yh_train_mb, y_train_mb)
+        # Compute train loss and accuracy
         train_loss /= (num_train_samples//batch_size)
         train_accuracy /= (num_train_samples//batch_size)
 
@@ -63,9 +69,11 @@ def train(model, x_train, y_train, x_valid, y_valid, config):
             yh_valid_mb = model.y
             valid_loss += loss
             valid_accuracy += util.calculateCorrect(yh_valid_mb, y_valid_mb)
+        # Compute validation loss and accuracy
         valid_loss /= (num_valid_samples//batch_size)
         valid_accuracy /= (num_valid_samples//batch_size)
 
+        # Track the best validation accuracy
         if valid_accuracy > best_valid_accuracy:
             best_valid_accuracy = valid_accuracy
         
@@ -81,6 +89,7 @@ def train(model, x_train, y_train, x_valid, y_valid, config):
                 patience += 1
                 if patience == max_patience:
                     print("best_valid_accuracy: ", best_valid_accuracy)
+                    # Save plots
                     util.plots(trainEpochLoss, 
                                trainEpochAccuracy, 
                                validEpochLoss, 
@@ -116,6 +125,7 @@ def modelTest(model, X_test, y_test):
         test accuracy
         test loss
     """
+    # Intialize parameters
     num_test_samples = len(X_test)
     batch_size = 64
     test_mb_itr = util.generate_minibatches((X_test, y_test), 
@@ -128,6 +138,7 @@ def modelTest(model, X_test, y_test):
         yh_test_mb = model.y
         test_loss += loss
         test_accuracy += util.calculateCorrect(yh_test_mb, y_test_mb)
+    # Compute test loss and accuracy
     test_loss /= (num_test_samples//batch_size)
     test_accuracy /= (num_test_samples//batch_size)
     return test_accuracy, test_loss

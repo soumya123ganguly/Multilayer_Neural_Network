@@ -42,9 +42,11 @@ def normalize_data(inp):
         mean = inp.mean()
         std = inp.std()
         return (inp-mean)/std
+    # Normalize each channel seperately
     inp_normalize_r = normalize_channel(inp[:, :channel_size])
     inp_normalize_g = normalize_channel(inp[:, channel_size:2*channel_size])
     inp_normalize_b = normalize_channel(inp[:, 2*channel_size:])
+    # Stack all the channels together
     inp_normalized_images = np.concatenate((inp_normalize_r, 
                                             inp_normalize_g, 
                                             inp_normalize_b), axis=1)
@@ -176,7 +178,7 @@ def createTrainValSplit(x_train,y_train):
     return (x_train[:4*n//5], y_train[:4*n//5], x_train[4*n//5:], y_train[4*n//5:])
 
 
-def load_data(path):
+def load_data(path, num_classes=20):
     """
     Loads, splits our dataset- CIFAR-100 into train, val and test sets and normalizes them
 
@@ -200,24 +202,36 @@ def load_data(path):
 
     images_dict = unpickle(os.path.join(cifar_path, "train"))
     data = images_dict[b'data']
-    label = images_dict[b'coarse_labels']
+    # Set train labels
+    if num_classes == 100:
+        label = images_dict[b'fine_labels']
+    else:
+        label = images_dict[b'coarse_labels']
     train_labels.extend(label)
     train_images.extend(data)
     train_images = np.array(train_images)
     train_labels = np.array(train_labels).reshape((len(train_labels),-1))
+    # Create train and validation split
     train_images, train_labels, val_images, val_labels = createTrainValSplit(train_images,train_labels)
 
+    # Normalize train images and generate one hot encoding labels
     train_normalized_images = normalize_data(train_images)
-    train_one_hot_labels = one_hot_encoding(train_labels)
+    train_one_hot_labels = one_hot_encoding(train_labels, num_classes)
 
+    # Normalize validation images and generate one hot encoding labels
     val_normalized_images = normalize_data(val_images)
-    val_one_hot_labels = one_hot_encoding(val_labels)
+    val_one_hot_labels = one_hot_encoding(val_labels, num_classes)
 
     test_images_dict = unpickle(os.path.join(cifar_path, "test"))
     test_data = test_images_dict[b'data']
-    test_labels = test_images_dict[b'coarse_labels']
+    # Set test labels
+    if num_classes == 100:
+        test_labels = test_images_dict[b'fine_labels']
+    else:
+        test_labels = test_images_dict[b'coarse_labels']
     test_images = np.array(test_data)
     test_labels = np.array(test_labels).reshape((len(test_labels), -1))
+    # Normalize test images and generate one hot encoding labels
     test_normalized_images= normalize_data(test_images)
-    test_one_hot_labels = one_hot_encoding(test_labels)
+    test_one_hot_labels = one_hot_encoding(test_labels, num_classes)
     return train_normalized_images, train_one_hot_labels, val_normalized_images, val_one_hot_labels,  test_normalized_images, test_one_hot_labels

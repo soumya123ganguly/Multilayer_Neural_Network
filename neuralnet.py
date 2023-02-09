@@ -165,10 +165,14 @@ class Layer():
         gradReqd=True means update self.w with self.dw. gradReqd=False can be helpful for Q-3b
         """
         batch_size = len(self.x)
+        # Compute Delta
         deltaCur = deltaCur[:, :-1]
         deltaCur = self.activation.backward(self.a)*deltaCur
+        # Compute Delta for next layer
         deltaNext = deltaCur.dot(self.w.T)
+        # Compute gradient
         self.dw = -self.x.T.dot(deltaCur)+2*batch_size*regularization*self.w
+        # Compute momentum
         self.v = momentum_gamma*self.v-learning_rate*self.dw/batch_size
         if gradReqd:
             self.w += self.v
@@ -192,6 +196,7 @@ class Neuralnetwork():
         self.y = None        # For saving the output vector of the model
         self.targets = None  # For saving the targets
 
+        # Initialize hyperparameters
         self.learning_rate = config['learning_rate']
         self.momentum_gamma = config['momentum_gamma']
         self.regularization = config['L2_penalty']
@@ -219,6 +224,7 @@ class Neuralnetwork():
         TODO: Compute forward pass through all the layers in the network and return the loss.
         If targets are provided, return loss and accuracy/number of correct predictions as well.
         """
+        # Compute forward pass
         self.x = x
         self.y = x
         self.targets = targets
@@ -238,7 +244,9 @@ class Neuralnetwork():
         TODO: Implement backpropagation here by calling backward method of Layers class.
         Call backward methods of individual layers.
         '''
+        # Output Layer Gradient
         deltaCur = util.append_bias(self.targets-self.y)
+        # Backprop from output layer to input layer
         for layer in reversed(self.layers):
                 deltaCur = layer.backward(deltaCur, self.learning_rate, 
                                           self.momentum_gamma, self.regularization, 

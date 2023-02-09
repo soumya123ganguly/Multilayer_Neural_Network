@@ -1,10 +1,42 @@
-## PA2-Starter
+<h1 align="center">
+  Multi-layer Neural Networks to classify CIFAR-100 Dataset
+</h1>
 
-1. main.py is the driver code that has to be run in order to run different set of experiments
-2. run get_cifar100data.sh to download the data. The dataset will be downloaded in 'data' directory 
-3. config files need to be in the 'config' directory
-4. You are free to create new functions, change existing function
-signatures, add/remove member variables/functions in the provided classes but you need to maintain the overall given structure 
-of the code. Specifically, you have to mandatorily use the classes provided in neuralnet.py to create your model (although, 
-like already mentioned, you can  add or remove variables/functions in these classes or change the function signatures)
-5. We have marked sections to be implemented by you as TODO for your convenience
+<p align="center">
+  <a href="#Introduction">Introduction</a> •
+  <a href="#Usage">Usage</a> •
+  <a href="#credits">Credits</a> •
+  <a href="#license">License</a>
+</p>
+
+## Introduction
+
+The project aims at implementing simple deep learning models with 1-2 hidden layers for classifying CIFAR-100 dataset. The project is divided into util.py, nueralnet.py, train.py, gradient.py, constants.py and main.py. Data loading, preprocessing is implemented in the data.py file. The network functions, loss function and activation functions are implemented in network.py file. The main.py file implements the training loop.
+
+## Usage
+
+```bash
+# Clone this repository
+$ https://github.com/nishanthrachakonda/PA-1
+
+# Go into the repository
+$ cd PA-1
+
+# Install dependencies
+$ pip3 install numpy
+$ pip3 install matplotlib
+$ pip3 install scikit-learn
+
+Change the network object with softmax activation function and multiclass_cross_entropy for 10 class classification and update the network object with sigmoid activation function and binary_cross_entropy for 2 class classification of 2 and 7, 5 and 8. Also uncomment the lines for choosing the data from these classes
+# Run the app
+$ python main.py --p 100 --learning-rate 0.01 --batch-size 32 --k 10 
+```
+
+## Credits
+
+Soumya and Nishanth have collaborated in implemting the project from ground up.
+
+## License
+
+MIT
+
