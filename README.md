@@ -11,26 +11,31 @@
 
 ## Introduction
 
-The project aims at implementing simple deep learning models with 1-2 hidden layers for classifying CIFAR-100 dataset. The project is divided into util.py, nueralnet.py, train.py, gradient.py, constants.py and main.py. Data loading, preprocessing is implemented in the data.py file. The network functions, loss function and activation functions are implemented in network.py file. The main.py file implements the training loop.
+The project aims at implementing simple deep learning models with 1-2 hidden layers for classifying CIFAR-100 dataset. The project is divided into util.py, nueralnet.py, train.py, gradient.py, constants.py and main.py. Data loading, preprocessing is implemented in the util.py file. The network functions, loss function and activation functions are implemented in nueralnet.py file. The train.py file implements the training loop. The main.py integrates all the code at one place.
 
 ## Usage
 
 ```bash
+# Download the data
+$ bash get_cifar100data.sh
+
 # Clone this repository
-$ https://github.com/nishanthrachakonda/PA-1
+$ https://github.com/soumya123ganguly/PA2
 
 # Go into the repository
-$ cd PA-1
+$ cd PA2
 
 # Install dependencies
 $ pip3 install numpy
 $ pip3 install matplotlib
 $ pip3 install scikit-learn
+$ pip3 install pyyaml
+$ pip3 install pandas
 
-Change the network object with softmax activation function and multiclass_cross_entropy for 10 class classification and update the network object with sigmoid activation function and binary_cross_entropy for 2 class classification of 2 and 7, 5 and 8. Also uncomment the lines for choosing the data from these classes
 # Run the app
-$ python main.py --p 100 --learning-rate 0.01 --batch-size 32 --k 10 
+$ python main.py --experiment <test_experiment>
 ```
+Change the configs in configs folder for updating the experiment hyperparameters
 
 ## Credits
 
